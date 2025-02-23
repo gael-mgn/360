@@ -50,6 +50,18 @@
     </div>
 
 
+    <div class="introPopup ui-element" id="introPopup">
+
+        <button class="close-btn" onclick="closeIntroPopup()">×</button>
+        <h2>Bienvenue sur cette visite virtuelle - A380 Aeroscopia</h2>
+        <div class="popup-container">
+            <img src="A380.jpg">
+        <h3>Explorez l'intérieur d'un A380 authentique !</h3>
+        <p>En visitant cet avion ayant participé aux essais en vol, vous vivrez une expérience immersive, vous permettant de vous déplacer à bord comme un véritable passager !</p>
+        </div>
+    </div>
+
+
 
 <!-- Pop-up Aide -->
     <div class="help-popup ui-element" id="helpPopup">
@@ -339,9 +351,17 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
             closeHelp();
             document.getElementById("popup").classList.add("show");
         }
+        function openIntroPopup() {
+            closeAllpopUp();
+            closeHelp();
+            document.getElementById("introPopup").classList.add("show");
+        }
 
         function closePopup() {
             document.getElementById("popup").classList.remove("show");
+        }
+        function closeIntroPopup() {
+            document.getElementById("introPopup").classList.remove("show");
         }
     </script>
 
@@ -368,7 +388,7 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
         }
 
         /* --- Menu Pop-up --- */
-        .popup {
+        .popup, .introPopup {
             z-index: 2;
             position: absolute;
             top: 50%;
@@ -386,7 +406,7 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
-        .popup.show {
+        .popup.show, .introPopup.show {
             opacity: 1;
             visibility: visible;
             transform: translate(-50%, -50%) scale(1);
@@ -397,6 +417,10 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
             height: 85%;
             overflow: hidden;
             overflow-y: auto; /* Active la barre de défilement verticale */
+        }
+        .popup-container img {
+            width: 100%;
+            height: auto;
         }
 
 
@@ -769,15 +793,6 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
 
 
 
-
-
-
-
-
-
-
-
-
     let changeView2 = false;
 
     let scene, camera, renderer;
@@ -799,6 +814,7 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
         function init() {
             salle(sallesss[0]);
             animate();
+            openIntroPopup();
         }
 
         function loadScene(index) {
