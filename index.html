@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visite Virtuelle - Démonstration</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f4f4f4, #eaeaea);
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .container {
+            width: 70%;
+            font-size: 22px;
+            max-width: 1280px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .section {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+        h2 {
+            color: #34495e;
+            border-left: 5px solid #27ae60;
+            padding-left: 10px;
+            transition: color 0.3s ease-in-out;
+        }
+        h2:hover {
+            color: #27ae60;
+        }
+        iframe {
+            width: 100%;
+            aspect-ratio: 1.6;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .cta {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .cta a {
+            text-decoration: none;
+            background: #27ae60;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s ease-in-out, transform 0.2s;
+        }
+        .cta a:hover {
+            background: #219150;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!--<header>Visite Virtuelle - Démonstration</header>-->
+    <div class="container">
+        <div class="section">
+            <h2>Introduction</h2>
+            <p>Découvrez notre solution immersive de visite virtuelle interactive pour valoriser vos espaces. Nous vous proposons de découvrir un prototype de visite virtuelle permettant d'explorer un espace de manière interactive. Cet outil offre une navigation immersive et intuitive, avec des points d'intérêt interactifs pour mettre en avant les équipements et caractéristiques de chaque lieu.</p>
+
+            <p>Ci-dessous, vous pouvez tester une visite virtuelle d'un appartement. Vous pouvez :</p>
+            <ul>
+                <li>Naviguer entre les différentes pièces via un menu de navigation intuitif.</li>
+                <li>Cliquer sur les points d'intérêt pour obtenir des informations sur les équipements.</li>
+                <li>Expérimenter une immersion complète en mode plein écran.</li>
+            </ul>
+        </div>
+        <div class="section">
+            <h2>Démonstration</h2>
+            <iframe src="https://gael-mgn.github.io/360/visites/logement/logement.html" allowfullscreen></iframe>
+        </div>
+        <div class="section">
+            <h2>Adaptation pour l'EIVP</h2>
+            <p>Cette technologie peut être déclinée pour valoriser les espaces de l'EIVP destinés à la location lors de séminaires. Voici les avantages qu'elle offre :</p>
+            <p class="bold">Mettez en avant les caractéristiques de chaque salle</p>
+            <ul>
+                <li>Indiquez le nombre de places et les configurations possibles (conférence, classe, etc.).</li>
+                <li>Présentez les équipements disponibles (vidéoprojecteurs, systèmes de visioconférence, mobilier, etc.).</li>
+                <li>Ajoutez des photos et vidéos complémentaires pour illustrer l'utilisation de la salle.</li>
+            </ul>
+            <p class="bold">Offrez une expérience immersive aux futurs locataires</p>
+            <ul>
+                <li>Permettez aux organisateurs de s'imaginer dans l'espace avant même de le visiter physiquement.</li>
+                <li>Facilitez la prise de décision avec une exploration autonome des lieux.</li>
+            </ul>
+
+            <p>Ce prototype illustre le potentiel d'une solution de virtualisation des espaces pour une meilleure mise en valeur des lieux. Si vous souhaitez en savoir plus ou discuter des possibilités d'adaptation à vos besoins, n'hésitez pas à me contacter !</p>
+        </div>
+        <div class="section">
+            <h2>Déploiement</h2>
+            <p>Le déploiement est simplifié grâce à un hébergement sur un serveur externe, permettant une intégration fluide via une balise iframe, compatible avec tout site web.</p>
+
+            <p>Pour ajouter la visite virtuelle à votre site, il vous suffira d'insérer le code suivant :</p>
+
+            <div class="code-container">
+                <code>&lt;iframe&gt; src="https://gael-mgn.github.io/360/visite.html" allowfullscreen>&lt;/iframe&gt;</code>
+            </div>
+        </div>
+        <div class="cta">
+            <a href="mailto:gael.maignan@eivp-paris.fr">Contact</a>
+        </div>
+        <p>Gaël Maignan - Tous droits réservés 2025</p>
+    </div>
+</body>
+</html>
+
+<style>
+    .bold {
+        font-weight: bold;
+    }
+</style>
+
+<!--
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visite Virtuelle - Démonstration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #34495e;
+        }
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 8px;
+        }
+        .cta {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .cta a {
+            text-decoration: none;
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+        .cta a:hover {
+            background: #219150;
+        }
+    </style>
+</head>
+<body>
+    <header>Visite Virtuelle - Démonstration</header>
+    <div class="container">
+        <div class="section">
+            <h2>Introduction</h2>
+            <p>Découvrez notre solution immersive de visite virtuelle interactive pour valoriser vos espaces.</p>
+        </div>
+        <div class="section">
+            <h2>Démonstration</h2>
+            <iframe src="URL_DE_LA_VISITE_VIRTUELLE"></iframe>
+        </div>
+        <div class="section">
+            <h2>Adaptation pour l'EIVP</h2>
+            <p>Nos visites permettent de mettre en avant les caractéristiques des salles, leur équipement et leur capacité.</p>
+        </div>
+        <div class="cta">
+            <a href="#contact">Me contacter</a>
+        </div>
+    </div>
+</body>
+</html>-->

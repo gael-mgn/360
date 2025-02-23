@@ -1,0 +1,44 @@
+#crosshair-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none; /* Évite que la croix bloque les interactions */
+}
+
+#crosshair {
+    width: 20px;
+    height: 20px;
+    position: relative;
+}
+
+#crosshair::before,
+#crosshair::after {
+    content: "";
+    position: absolute;
+    background: white;
+    width: 2px;
+    height: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#crosshair::after {
+    width: 20px;
+    height: 2px;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+}
+
+#camera-coordinates {
+    margin-top: 5px;
+    color: white;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 3px 8px;
+    border-radius: 4px;
+}

@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visite Virtuelle - Aeroscopia</title>
+    <meta name="robots" content="noindex, nofollow">
+    
+    <link href="../../style/style.css" rel="stylesheet">
+    <link href="../../style/debug.css" rel="stylesheet">
+</head>
+<body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- Conteneur global -->
+<div id="main-container">
+    <!-- Conteneur pour la scène 3D -->
+    <div id="scene-container">
+        <!-- Écran de chargement -->
+        <div id="loading-screen">
+            <div class="loader"></div>
+            <p>Chargement...</p>
+        </div>
+
+
+        <!-- Bouton Aide -->
+    <button class="help-btn ui-element" onclick="openHelp()">❓ Aide</button>
+
+
+
+<div class="toolbar ui-element">
+        <div class="tool-btn ui-element" title="Accueil" onclick="openPopup()"><img src="../../img/house.png"></div>
+        <div class="tool-btn ui-element" title="Informations" onclick="showInfoBox('Informations','Visite virtuelle d\'un appartement fictif. Tous droits réservés.', null, true)"><img src="../../img/info.png"></div>
+        <div class="tool-btn ui-element" title="Plein écran" onclick="toggleFullScreen()">⛶</div>
+        <div class="tool-btn ui-element" title="Paramètres"><img src="../../img/settings.png"></div>
+    </div>
+
+
+
+        <!-- Menu Pop-up -->
+    <div class="popup ui-element" id="popup">
+
+        <button class="close-btn" onclick="closePopup()">×</button>
+        <h2>Liste des salles</h2>
+        <div class="popup-container">
+        <div class="room-grid" id="room-grid">
+        </div>
+    </div>
+    </div>
+
+
+
+<!-- Pop-up Aide -->
+    <div class="help-popup ui-element" id="helpPopup">
+        <h2 class="help-title">Besoin d'aide ?</h2>
+        <button class="close-btn" onclick="closeHelp()">×</button>
+        <div class="help-content">
+            <p>Voici un aperçu des fonctionnalités principales.</p>
+            <h3>Se déplacer</h3>
+            <p>Afin de changer de vue, vous pouvez cliquer sur les pastilles présentes au sol.</p>
+            <p>Il est également possible de se déplacer rapidement d'une pièce à une autre grâce au menu listant les différentes zones visitables.</p>
+            <h3>Points d'intérêt</h3>
+            <img src="../../img/tuto1.webp" alt="Aide">
+            <p>Les points d'intérêt vous permettent d'en savoir plus sur un élément de la scène, il suffit de cliquer dessus, ouvrant une boite de dialogue.</p>
+        </div>
+    </div>
+
+    <script>
+        function openHelp() {
+            closeAllpopUp();
+            const helpPopup = document.getElementById("helpPopup");
+            helpPopup.style.visibility = "visible";
+            helpPopup.classList.remove("hide"); // Retirer la classe de fermeture
+            helpPopup.classList.add("show");
+        }
+
+        function closeHelp() {
+            const helpPopup = document.getElementById("helpPopup");
+            helpPopup.classList.remove("show");
+            helpPopup.classList.add("hide"); // Ajouter la classe de fermeture
+            setTimeout(() => {
+                helpPopup.style.visibility = "hidden"; // Cache complètement après l'animation
+            }, 300);
+        }
+    </script>
+
+        <div id="crosshair-container">
+            <div id="crosshair"></div>
+            <div id="camera-coordinates">Lon: 0, Lat: 0</div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .toolbar {
+            display: flex;
+            background: #1E1E1E;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+            gap: 12px;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: white;
+        }
+
+        .tool-btn {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #292929;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out, transform 0.1s;
+            font-size: 1.4em;
+        }
+        .tool-btn img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .tool-btn:hover {
+            background: #3A3A3A;
+        }
+
+        .tool-btn:active {
+            transform: scale(0.9);
+        }
+    </style>
+
+
+<script>
+        function closeBox() {
+            document.getElementById("infoBox").classList.add("hidden");
+        }
+    </script>
+
+
+
+
+
+
+
+
+
+<script>
+function closeAllpopUp(){
+    document.querySelectorAll(".info-box").forEach(box => box.remove());
+}
+function showInfoBox(title, description, imageUrl = null, center = false, url= null) {
+    closePopup();
+    closeHelp();
+    closeAllpopUp();
+    // Créer la boîte d'information
+    const infoBox = document.createElement("div");
+    infoBox.classList.add("info-box");
+    
+    // Appliquer un style pour centrer si l'option est activée
+    if (center) {
+        infoBox.style.position = "absolute";
+        infoBox.style.top = "50%";
+        infoBox.style.left = "50%";
+        infoBox.style.transform = "translate(-50%, -50%)";
+    }
+    
+    // Ajouter le bouton de fermeture
+    const closeButton = document.createElement("button");
+    closeButton.classList.add("close-btn");
+    closeButton.innerHTML = "×";
+    closeButton.onclick = () => {
+        infoBox.style.opacity = "0";
+        infoBox.style.transform = center ? "translate(-50%, -50%) scale(0.9)" : "scale(0.9)";
+        setTimeout(() =>   document.getElementById("scene-container").removeChild(infoBox), 300);
+    };
+    
+    // Ajouter l'image si fournie
+    if (imageUrl) {
+        const image = document.createElement("img");
+        image.src = imageUrl;
+        image.alt = "Image";
+        infoBox.appendChild(image);
+    }
+    
+    // Conteneur du contenu
+    const content = document.createElement("div");
+    content.classList.add("info-box-content");
+    
+    // Ajouter le titre
+    const titleElement = document.createElement("div");
+    titleElement.classList.add("info-box-title");
+    titleElement.textContent = title;
+    
+    // Ajouter la description
+    const descriptionElement = document.createElement("div");
+    descriptionElement.classList.add("info-box-description");
+    descriptionElement.textContent = description;
+    
+    // Ajouter les éléments au contenu
+    content.appendChild(titleElement);
+    content.appendChild(descriptionElement);
+    
+    // Ajouter le bouton de fermeture et le contenu à la boîte
+    infoBox.appendChild(closeButton);
+    infoBox.appendChild(content);
+    
+
+    if (url){
+        console.log(url);
+        // Ajouter un bouton d'action
+        const button = document.createElement("a");
+        button.setAttribute("target", "_blank");
+        button.classList.add("info-box-button");
+        button.href = url;
+        button.textContent = "En savoir plus";
+        content.appendChild(button);
+    }
+
+
+    // Ajouter la boîte au corps du document
+    document.getElementById("scene-container").appendChild(infoBox);
+    
+    // Appliquer une animation d'apparition
+    setTimeout(() => {
+        infoBox.style.opacity = "1";
+        infoBox.style.transform = center ? "translate(-50%, -50%) scale(1)" : "scale(1)";
+    }, 10);
+
+    // Appliquer le style initial pour l'animation
+    infoBox.style.opacity = "0";
+    infoBox.style.transform = center ? "translate(-50%, -50%) scale(0.9)" : "scale(0.9)";
+    infoBox.style.transition = "opacity 0.3s, transform 0.3s";
+}
+
+
+
+
+</script>
+
+        <style>
+
+
+        .info-box {
+            width: 320px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #1E1E1E;
+            color: #E0E0E0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            position: absolute;
+            transition: transform 0.3s ease-in-out, opacity 0.3s;
+            right: 10px;
+            top: 10px;
+        }
+
+        .info-box img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .info-box-content {
+            padding: 16px;
+        }
+
+        .info-box-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #FFFFFF;
+        }
+
+        .info-box-description {
+            font-size: 1em;
+            color: #B0B0B0;
+            margin-bottom: 12px;
+        }
+
+        /* Bouton En savoir plus */
+        .info-box-button {
+            display: inline-block;
+            padding: 10px 15px;
+            font-size: 1em;
+            color: #121212;
+            background: #FFD700;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+        }
+
+        .info-box-button:hover {
+            background: #FFC107;
+        }
+
+        /* Bouton de fermeture */
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            background: #FF5252;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .close-btn:hover {
+            background: #D32F2F;
+        }
+
+        /* Effet de disparition */
+        .hidden {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+        }
+
+    </style>
+
+
+    <script>
+        function openPopup() {
+            closeAllpopUp();
+            closeHelp();
+            document.getElementById("popup").classList.add("show");
+        }
+
+        function closePopup() {
+            document.getElementById("popup").classList.remove("show");
+        }
+    </script>
+
+
+<!--Menu-->
+<style>
+
+
+        /* --- Bouton d'ouverture --- */
+        .open-menu {
+            background: #292929;
+            color: #E0E0E0;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            position: absolute;
+            transition: background 0.3s;
+        }
+
+        .open-menu:hover {
+            background: #3A3A3A;
+        }
+
+        /* --- Menu Pop-up --- */
+        .popup {
+            z-index: 2;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            width: 80%;
+            max-width: 650px;
+            height: 80%;
+            background: #1E1E1E;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .popup-container {
+            width: 100%;
+            padding-right: 10px; /*Permet de laisser un espace à droite pour ne pas coller à la barre de srcoll*/
+            height: 85%;
+            overflow: hidden;
+            overflow-y: auto; /* Active la barre de défilement verticale */
+        }
+
+
+
+        /* --- Personnalisation de la scrollbar (optionnel) --- */
+        .popup-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .popup-container::-webkit-scrollbar-track {
+            background: #292929;
+            border-radius: 10px;
+        }
+
+        .popup-container::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 10px;
+        }
+
+        .popup-container::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+
+
+
+
+        /* --- Bouton de fermeture (croix) --- */
+        /*.close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: #292929;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .close-btn i {
+            color: #E0E0E0;
+            font-size: 1.2em;
+        }
+
+        .close-btn:hover {
+            background: #FF5555;
+            transform: scale(1.1);
+        }*/
+
+        /* --- Grille des salles --- */
+        .room-grid {
+            display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 20px;
+
+        }
+
+        .room {
+            background: #292929;
+            border-radius: 8px;
+            text-align: center;
+            overflow: hidden;
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        .room:hover {
+            transform: translateY(-5px);
+            background: #3A3A3A;
+        }
+
+        .room img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-bottom: 3px solid #404040;
+        }
+
+        .room-content {
+            padding: 12px;
+        }
+
+        .room h3 {
+            font-size: 1em;
+            margin-bottom: 6px;
+        }
+
+        .room p {
+            font-size: 0.9em;
+            color: #B0B0B0;
+        }
+    </style>
+
+<!--Info-box-->
+<script>
+    function showInfoBox2(point) {
+
+        console.log(point);
+        const point2 = pointInteret[point.id];
+
+
+
+        if (point2.img){
+            //showInfoBox(title, description, imageUrl = null, center = false, url= null)
+            showInfoBox(point2.title, point2.description, point2.img, false, point2.url);
+            //document.getElementById('info-img').src = point2.img;
+            //document.getElementById('info-img').style.display = 'flex';
+        }
+        else {
+            showInfoBox(point2.title, point2.description, null, false, point2.url);
+            //document.getElementById('info-img').style.display = 'none';
+        }
+
+        const ul = document.getElementById("info-list");
+
+            //Vider la liste existante
+            ul.innerHTML = "";
+            if(point2.list) {
+            point2.list.forEach(texte => {
+                const li = document.createElement("li");
+                li.textContent = texte;
+                ul.appendChild(li);
+            });
+        }
+
+
+        document.getElementById('info-title').innerText = point2.title;
+        document.getElementById('info-description').innerText = point2.description;
+        document.getElementById('info-box').style.display = 'block';
+    }
+    function closeInfoBox() {
+        document.getElementById('info-box').style.display = 'none';
+    }
+</script>
+<!--Fullscreen-->
+<script>
+    // Fonction pour activer/désactiver le plein écran
+    function toggleFullScreen() {
+        const container = document.getElementById("scene-container");
+
+        if (!document.fullscreenElement) {
+            if (container.requestFullscreen) {
+                container.requestFullscreen();
+            } else if (container.mozRequestFullScreen) { // Firefox
+                container.mozRequestFullScreen();
+            } else if (container.webkitRequestFullscreen) { // Chrome, Safari, Edge
+                container.webkitRequestFullscreen();
+            } else if (container.msRequestFullscreen) { // IE/Edge
+                container.msRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+</script>
+
+
+
+
+
+
+
+<!-- HELP -->
+<style>
+
+
+        /* --- Bouton d'Aide en haut à gauche --- */
+        .help-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #292929;
+            color: #E0E0E0;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .help-btn:hover {
+            background: #3A3A3A;
+            transform: scale(1.1);
+        }
+
+        /* --- Pop-up d'Aide --- */
+        .help-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            width: 85%;
+            max-width: 600px;
+            height: 80vh;
+            background: #1E1E1E;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .help-popup.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .help-popup.hide {
+            transform: translate(-50%, -40%) scale(0.9);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+
+
+
+
+        /* --- Contenu du pop-up --- */
+        .help-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .help-title {
+            margin-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .help-content img {
+            display: block; /* Permet de centrer avec margin auto */
+            margin: 10px auto; /* Centre horizontalement */
+            width: 100%;
+            height: auto;
+            max-height: 250px;
+            width: auto;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* --- Personnalisation de la scrollbar (optionnel) --- */
+        .help-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .help-content::-webkit-scrollbar-track {
+            background: #292929;
+            border-radius: 10px;
+        }
+
+        .help-content::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 10px;
+        }
+
+        .help-content::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+
+    </style>
+
+
+
+
+
+
+
+
+
+<script>
+
+    const pointInteret = {
+        0:{ title: "A380", description:"Modèle d'exposition - Aeroscopia A380", url:"https://www.airbus.com/en/products-services/commercial-aircraft/passenger-aircraft/a380"},
+        1:{ title: "A320", description:"Modèle d'exposition - Aeroscopia A320", url:"https://www.airbus.com/en/products-services/commercial-aircraft/passenger-aircraft/a320-family"},
+        2:{ title: "A340", description:"Modèle d'exposition - Aeroscopia A340", url:"https://www.airbus.com/en/about-us/our-history/our-journey"}
+    };
+
+    const pointsDeVue2 = {
+        0:{ title:"vue 1", description:"Description", img: 'https://gael-mgn.github.io/360/visites/aeroscopia/3.jpg', salle:0,
+
+        interets: [
+            { id: 0, lat: -29, lon: -29 },
+            { id: 1, lat: -7, lon: 25 },
+            { id: 2, lat: -3.5, lon: 39 }
+        ],
+        ground: [
+            { index:1, lat: -20, lon: 264  },
+        ]
+        },
+        1:{ img: 'https://gael-mgn.github.io/360/visites/aeroscopia/1.jpg', salle:0,
+
+        interets: [
+        ],
+        ground: [
+            { index:0, lat: -22, lon: 190  },
+            { index:2, lat: -26, lon: 0  }
+        ]
+        },
+        2:{ img: 'https://gael-mgn.github.io/360/visites/aeroscopia/2.jpg', salle:1,
+        interets: [
+        ],
+        ground: [
+            { index:1, lat: -22, lon: 203  }
+        ]
+        }
+    };
+
+    const sallesss = {
+        0:{ title: "Cuisine", description: "Superficie: 12m²", img: "img/preview1.webp", views: []},
+        1:{ title: "Chambre", description: "Superficie: 9m²", views: [], img: "img/preview4.webp"},
+        2:{ title: "Jardin", description: "Jardin: 290m²", views: [], img: "img/jardin.webp"}
+    };
+
+    // Associe les différentes vues aux pièces
+    Object.entries(pointsDeVue2).forEach(([key, value]) => {
+        if(sallesss[value.salle]){
+            sallesss[value.salle].views.push(key);
+        }
+    });
+
+
+    // Création d'un gestionnaire de chargement
+    let textures = {};
+    const manager = new THREE.LoadingManager();
+    const loadingScreen = document.getElementById("loading-screen");
+    // Quand tout est chargé, on enlève l'écran noir et on initialise la scène
+    manager.onLoad = function () {
+        loadingScreen.style.display = "none";
+        init();
+    };
+    // Préchargement des textures
+    function preloadTextures() {
+        const loader = new THREE.TextureLoader(manager);
+        for (let key in pointsDeVue2) {
+            textures[key] = loader.load(pointsDeVue2[key].img);
+        }
+    }
+
+
+
+    /*
+    /// Menu de chargement ///
+    // Création du gestionnaire de chargement
+    const loadingManager = new THREE.LoadingManager();
+    // Suppression de l'écran de chargement une fois terminé
+    loadingManager.onLoad = function () {
+    const loadingScreen = document.getElementById("loading-screen");
+    loadingScreen.classList.add("loading-hidden");
+    setTimeout(() => {
+        loadingScreen.style.display = "none"; // Supprime complètement après l'animation
+    }, 1000); // Durée du fondu (1s)
+    };
+    // Chargement des textures avec le gestionnaire
+    //pointsDeVue.forEach(point => {
+        //pointsDeVue[point.img] = new THREE.TextureLoader(loadingManager).load(point.img);
+    //});
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+    let changeView2 = false;
+
+    let scene, camera, renderer;
+    let currentTextureIndex = -1;
+    let sphere, material;
+    let lon = 0;
+    let lat = 0;
+    let phi = 0, theta = 0;
+
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, 0);
+
+    renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+
+        function init() {
+            salle(sallesss[0]);
+            animate();
+        }
+
+        function loadScene(index) {
+            console.log(index, currentTextureIndex);
+            if (index != currentTextureIndex){
+                closeAllpopUp();
+                currentTextureIndex = index;
+                changeView2 = true;
+            const textureLoader = new THREE.TextureLoader();
+            textureLoader.load(pointsDeVue2[currentTextureIndex].img, (newTexture) => {
+                if (!material) {
+                    createSphere(newTexture);
+                } else {
+                    fadeTransition(newTexture);
+                }
+            });
+
+
+
+            groundMarkers.forEach(marker => scene.remove(marker));
+            groundMarkers= [];
+
+            if (pointsDeVue2[currentTextureIndex].ground){
+                pointsDeVue2[currentTextureIndex].ground.forEach(point => {
+                    const marker = createGroundMarker(point);
+                    scene.add(marker);
+                    groundMarkers.push(marker);
+                });
+            }
+
+
+
+            }
+            /*
+                    changeView2 = true;
+        closeInfoBox();
+
+        const point = pointsDeVue[index];
+        texture.dispose();
+        texture = new THREE.TextureLoader().load(point.img);
+        sphere.material.map = texture;
+        sphere.material.needsUpdate = true;
+
+        //lon = point.lon;
+        //lat = point.lat;
+
+        addPointsOfInterest(index); // Ajoute les points d'intérêt de la vue
+            */
+        addPointsOfInterest(currentTextureIndex);
+
+        }
+
+        function fadeTransition(newTexture) {
+            const newMaterial = new THREE.MeshBasicMaterial({ map: newTexture, transparent: true, opacity: 0 });
+            const oldMaterial = sphere.material;
+            
+            const fadeSphere = new THREE.Mesh(sphere.geometry, newMaterial);
+            scene.add(fadeSphere);
+
+            const fadeDuration = 500; // 500 ms
+            const startTime = performance.now();
+
+            function fadeIn() {
+                const elapsed = performance.now() - startTime;
+                const progress = Math.min(elapsed / fadeDuration, 1); // Clamp entre 0 et 1
+
+                newMaterial.opacity = progress;
+                oldMaterial.opacity = 1 - progress;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(fadeIn);
+                } else {
+                    scene.remove(sphere);
+                    sphere = fadeSphere;
+                    material = newMaterial;
+                }
+            }
+
+            fadeIn();
+        }
+
+        function createSphere(texture) {
+            const geometry = new THREE.SphereGeometry(500, 60, 40);
+            geometry.scale(1, 1, -1);
+            
+            material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 1 });
+            sphere = new THREE.Mesh(geometry, material);
+            scene.add(sphere);
+        }
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+    // Récupérer la taille du conteneur et ajuster le rendu en conséquence
+    function resizeRendererToDisplaySize(renderer) {
+        const container = document.getElementById("scene-container");
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        renderer.setSize(width, height);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+    }
+
+    // Initialisation
+    const container = document.getElementById("scene-container");
+    resizeRendererToDisplaySize(renderer);
+    container.appendChild(renderer.domElement);
+
+
+
+
+    let markers = [];
+
+    function addPointsOfInterest(viewId) {
+        // Supprimer les anciens points d’intérêt
+        clearPointsOfInterest();
+
+        if (pointsDeVue2[viewId].interets) {
+            pointsDeVue2[viewId].interets.forEach(point => {
+                const marker = createMarker(point);
+                scene.add(marker);
+                markers.push(marker);
+            });
+        }
+    }
+
+    const markerTexture = new THREE.TextureLoader().load('https://gael-mgn.github.io/360/img/marker.png');
+    const hoverTexture = new THREE.TextureLoader().load("https://gael-mgn.github.io/360/img/marker_hover.png");
+    let hoveredMarker = null; // Stocke le marqueur actuellement survolé, permet de changer l'icône au survol
+
+
+    function createMarker(point) {
+        
+        const material = new THREE.SpriteMaterial({ map: markerTexture });
+        const marker = new THREE.Sprite(material);
+
+        // Convertir longitude/latitude en coordonnées 3D sur la sphère
+        const radius = 490; // Juste en dessous du fond pour être visible
+        const phi = THREE.MathUtils.degToRad(90 - point.lat - 2);
+        const theta = THREE.MathUtils.degToRad(point.lon);
+
+        marker.position.set(
+            radius * Math.sin(phi) * Math.cos(theta),
+            radius * Math.cos(phi),
+            radius * Math.sin(phi) * Math.sin(theta)
+        );
+
+        marker.renderOrder = 1;
+
+        // Ajuster la taille du marqueur (valeur en fonction de la scène)
+        marker.scale.set(24, 24, 1);
+
+        // Ajouter les données utilisateur
+        marker.userData = point;
+
+        return marker;
+    }
+    function clearPointsOfInterest() {
+        markers.forEach(marker => scene.remove(marker));
+        markers = [];
+    }
+    const textureLoader = new THREE.TextureLoader();
+    const spriteTexture = textureLoader.load('https://gael-mgn.github.io/360/img/sprite.png');
+    const columns = 4; // Nombre de colonnes dans la sprite sheet
+    const rows = 2; // Nombre de lignes dans la sprite sheet
+    spriteTexture.wrapS = THREE.RepeatWrapping;
+    spriteTexture.wrapT = THREE.RepeatWrapping;
+    spriteTexture.repeat.set(1 / columns, 1 / rows);
+
+    let currentFrame = 0; // Frame actuelle
+    const animatedMarkers = []; // Stocke tous les marqueurs animés
+
+
+/*
+
+// Création du matériau avec la texture de la pastille
+    const material = new THREE.SpriteMaterial({ map: spriteTexture });
+    const marker = new THREE.Sprite(material);
+
+    // Conversion des coordonnées en position au sol
+    const radius = 490; // Rayon du panorama
+    const phi = THREE.MathUtils.degToRad(90 - point.lat - 2);
+    const theta = THREE.MathUtils.degToRad(point.lon);
+
+    marker.position.set(
+        radius * Math.sin(phi) * Math.cos(theta),
+        radius * Math.cos(phi), // Position au sol
+        radius * Math.sin(phi) * Math.sin(theta)
+    );
+
+    marker.renderOrder = 1;
+
+    // Ajuster la taille de la pastille pour éviter la distorsion
+    marker.scale.set(50, 50, 1); // Taille constante pour un affichage stable
+
+    // Ajouter les données utilisateur
+    marker.userData = point;
+
+    return marker;
+*/
+
+    function createGroundMarker(point) {
+        // Création de la géométrie de la pastille (plane = plat)
+        const geometry = new THREE.PlaneGeometry(200, 200);
+        const material = new THREE.MeshBasicMaterial({
+            map: spriteTexture,
+            transparent: true,
+            depthTest: false,
+        });
+
+        const marker = new THREE.Mesh(geometry, material);
+
+        // Conversion des coordonnées en position au sol
+        const radius = 490; // Rayon du panorama
+        const phi = THREE.MathUtils.degToRad(90 - point.lat - 2);
+        const theta = THREE.MathUtils.degToRad(point.lon);
+
+        marker.position.set(
+            radius * Math.sin(phi) * Math.cos(theta),
+            radius * Math.cos(phi), // Position au sol
+            radius * Math.sin(phi) * Math.sin(theta)
+        );
+
+        // Rotation pour qu'elle soit bien plate sur le sol
+        marker.rotation.x = -Math.PI / 2;
+        marker.renderOrder = 1;
+
+        const scaleFactor = Math.abs(point.lat) / 90; // Plus on s'approche de 0°, plus c'est petit
+        marker.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+        marker.userData = point;
+        return marker;
+    }
+
+    let groundMarkers = [];
+
+
+
+    /// Animation des marqueurs ///
+    setInterval(() => {
+        const columnIndex = currentFrame % columns;
+            const rowIndex = Math.floor(currentFrame / columns);
+
+            spriteTexture.offset.x = columnIndex / columns;
+            spriteTexture.offset.y = 1 - (rowIndex + 1) / rows;
+
+            currentFrame = (currentFrame + 1) % (columns * rows);
+    }, 150);
+
+
+    //init();
+    preloadTextures();
+
+
+    const roomList = document.getElementById('room-grid');
+    const viewMenu = document.getElementById('view-menu');
+    const viewList = document.getElementById('view-list');
+
+
+
+    document.querySelectorAll(".ui-element").forEach(element => {
+    element.addEventListener("mousedown", (event) => event.stopPropagation());
+    element.addEventListener("mouseup", (event) => event.stopPropagation());
+    element.addEventListener("click", (event) => event.stopPropagation());
+});
+
+
+    // -------------- Events --------------------//
+    // Redimensionnement dynamique si la fenêtre change
+    window.addEventListener('resize', () => resizeRendererToDisplaySize(renderer));
+    /// Gestion de clic souris pour le déplacement de la caméra ///
+    let isDragging = false; // Suivi du clic initial dans la scène
+    // Vérifier si le clic commence dans la scène
+    document.getElementById("scene-container").addEventListener("mousedown", () => {
+        isDragging = true;
+        window.getSelection().removeAllRanges(); // Force la désélection du texte permettant de bouger la caméra alors que tu texte était sélectionné
+    });
+    // Désactiver le déplacement si le clic est relâché
+    document.addEventListener("mouseup", () => {
+        isDragging = false;
+    });
+    // Vérifier avant de bouger la caméra
+    document.addEventListener("mousemove", (event) => {
+    if (isDragging) {
+        // Code pour déplacer la caméra (OrbitControls gère déjà cela)
+        lon = (onPointerDownMouseX - event.clientX) * 0.1 + onPointerDownLon;
+        lat = (event.clientY - onPointerDownMouseY) * 0.1 + onPointerDownLat;
+    }
+
+
+     // Normaliser les coordonnées de la souris (de -1 à 1 pour le Raycaster)
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Lancer un rayon pour détecter les intersections avec les points d'intérêt
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(markers, true);
+    const intersects2 = raycaster.intersectObjects(groundMarkers, true);
+
+    if (intersects.length > 0 || intersects2.length > 0) {
+        document.body.style.cursor = "pointer";
+    } else {
+        document.body.style.cursor = "default";
+    }
+
+
+if (intersects.length > 0) {
+        const marker = intersects[0].object; // Premier objet touché
+        if (hoveredMarker !== marker) {
+            // Restaurer l'ancien marqueur survolé
+            if (hoveredMarker) {
+                hoveredMarker.material.map = markerTexture;
+            }
+            // Appliquer la texture de survol
+            marker.material.map = hoverTexture;
+            hoveredMarker = marker;
+        }
+    } else {
+        // Si aucun marqueur n'est survolé, restaurer l'ancien marqueur
+        if (hoveredMarker) {
+            hoveredMarker.material.map = markerTexture;
+            hoveredMarker = null;
+        }
+    }
+
+
+    });
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    window.addEventListener("click", (event) => {
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(markers);
+        const intersects2 = raycaster.intersectObjects(groundMarkers);
+
+        if (changeView2 == false){
+            if (intersects.length > 0) {
+            const point = intersects[0].object.userData;
+            showInfoBox2(point);
+        }
+        if (intersects2.length > 0) {
+            const point = intersects2[0].object.userData;
+            console.log(point);
+            loadScene(point.index);
+        }
+        }
+    });
+
+
+/*
+    /// Menu de chargement ///
+    // Création du gestionnaire de chargement
+    const loadingManager = new THREE.LoadingManager();
+    // Suppression de l'écran de chargement une fois terminé
+    loadingManager.onLoad = function () {
+        const loadingScreen = document.getElementById("loading-screen");
+    loadingScreen.classList.add("loading-hidden");
+    setTimeout(() => {
+        loadingScreen.style.display = "none"; // Supprime complètement après l'animation
+    }, 1000); // Durée du fondu (1s)
+    };
+    // Chargement des textures avec le gestionnaire
+    //pointsDeVue.forEach(point => {
+        //pointsDeVue[point.img] = new THREE.TextureLoader(loadingManager).load(point.img);
+    //});
+*/
+
+   
+   
+
+
+ // Ajout dynamique des pièces dans le menu
+    
+    for (let room in sallesss) {
+        const listItem = document.createElement('div');
+        listItem.classList.add("room");
+        //listItem.innerHTML = `<img src="${rooms2[room].views[0].image}" alt="${room}">
+        //listItem.innerHTML = `<div class="room-title">${sallesss[room].title}</div>
+          //                    <div class="room-description">${sallesss[room].description}</div>`;
+        listItem.innerHTML = `
+            <div class="room">
+                <img src="${sallesss[room].img}" alt="${sallesss[room].title}">
+                <div class="room-content">
+                    <h3>${sallesss[room].title}</h3>
+                    <p>${sallesss[room].description}</p>
+                </div>
+            </div>`;
+        listItem.addEventListener('click', () => {
+            salle(sallesss[room]);
+            closePopup();
+    });
+        roomList.appendChild(listItem);
+    }
+    function salle(roomName) {
+        console.log("changement : ", roomName.views[0]);
+        loadScene(roomName.views[0]);
+        changeView2 = true;
+
+        /*
+        const roomNames = Object.keys(rooms2);
+        const chambreIndex = roomNames.indexOf(roomName);
+
+        viewList.innerHTML = "";
+        viewMenu.style.display = "block";
+        
+        rooms2[roomName].views.forEach(view => {
+            const listItem = document.createElement('li');
+            listItem.classList.add("view-item");
+            //listItem.innerHTML = `<img src="${view.image}" alt="${view.title}">
+            listItem.innerHTML = `<img src="${view.image}" alt="${view.title}">
+                                  <div class="room-title">${view.title}</div>
+                                  <div class="room-description">${view.description}</div>`;
+            listItem.addEventListener('click', () => {
+                //changeView(view.id);
+                loadScene(view.id);
+        });
+            viewList.appendChild(listItem);
+        });
+
+        // Affiche la vue de la première scène
+        //changeView(rooms2[roomName].views[0].id);
+
+        loadScene(rooms2[roomName].views[0].id);
+
+        document.querySelectorAll('#room-list li').forEach(el => el.classList.remove('active-room'));
+        document.querySelector(`#room-list li:nth-child(${chambreIndex+1})`).classList.add('active-room');*/
+    }
+    // Ouvrir le menu des vues
+    function openViewMenu(roomName) {
+        viewList.innerHTML = "";
+        viewMenu.style.display = "block";
+        
+        rooms2[roomName].views.forEach(view => {
+            const listItem = document.createElement('li');
+            listItem.classList.add("view-item");
+            listItem.innerHTML = `<img src="${view.image}" alt="${view.title}">
+                                  <div class="room-title">${view.title}</div>
+                                  <div class="room-description">${view.description}</div>`;
+            listItem.addEventListener('click', () => changeView(view.id));
+            viewList.appendChild(listItem);
+    });
+
+
+
+    // Mise en surbrillance de la pièce sélectionnée
+    //document.querySelectorAll('#room-list li').forEach(el => el.classList.remove('active-room'));
+    //document.querySelector(`#room-list li:nth-child(${index + 1})`).classList.add('active-room');
+
+
+    // Charger la première vue de la pièce
+    //changeView(rooms2[roomName].views[0].id);
+    //loadScene(rooms2[roomName].views[0].id);
+    }
+
+
+
+    function changeView(index) {
+        changeView2 = true;
+
+        const point = pointsDeVue[index];
+        texture.dispose();
+        texture = new THREE.TextureLoader().load(point.img);
+        sphere.material.map = texture;
+        sphere.material.needsUpdate = true;
+
+        //lon = point.lon;
+        //lat = point.lat;
+
+        addPointsOfInterest(index); // Ajoute les points d'intérêt de la vue
+    }
+
+    let onPointerDownMouseX = 0, onPointerDownMouseY = 0;
+    let onPointerDownLon = 0, onPointerDownLat = 0;
+
+    function onPointerDown(event) {
+        onPointerDownMouseX = event.clientX;
+        onPointerDownMouseY = event.clientY;
+        onPointerDownLon = lon;
+        onPointerDownLat = lat;
+        document.body.style.cursor = "default";
+    }
+
+    document.addEventListener('mousedown', onPointerDown);
+
+    function animate() {
+        requestAnimationFrame(animate);
+        lat = Math.max(-85, Math.min(85, lat));
+        phi = THREE.MathUtils.degToRad(90 - lat);
+        theta = THREE.MathUtils.degToRad(lon);
+        camera.lookAt(
+            Math.sin(phi) * Math.cos(theta),
+            Math.cos(phi),
+            Math.sin(phi) * Math.sin(theta)
+        );
+
+        renderer.render(scene, camera);
+        changeView2 = false;
+    }
+
+    animate();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /// DEBUG ///
+    // Position de la caméra (uniquement pour DEBUB)
+    const crosshairContainer = document.getElementById("crosshair-container");
+    const cameraCoordinates = document.getElementById("camera-coordinates");
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Shift") {
+            crosshairContainer.style.display = "flex";
+            updateCameraCoordinates(); // Met à jour immédiatement
+        }
+    });
+    document.addEventListener("keyup", (event) => {
+        if (event.key === "Shift") {
+            crosshairContainer.style.display = "none";
+        }
+    });
+    // Met à jour les coordonnées en fonction de l'orientation de la caméra
+    function updateCameraCoordinates() {
+        if (!crosshairContainer.style.display.includes("none")) {
+            const { longitude, latitude } = getCameraOrientation();
+            cameraCoordinates.innerText = `Lat: ${latitude.toFixed(2)}, Lon: ${longitude.toFixed(2)}`;
+        }
+        requestAnimationFrame(updateCameraCoordinates);
+    }
+    // Fonction pour récupérer la longitude et latitude de la caméra
+    function getCameraOrientation() {
+        const vector = new THREE.Vector3(0, 0, -1);
+        vector.applyQuaternion(camera.quaternion);
+
+        // Calcul de la longitude et de la latitude
+        const longitude = 90 - THREE.MathUtils.radToDeg(Math.atan2(vector.x, vector.z));
+        const latitude = THREE.MathUtils.radToDeg(Math.asin(vector.y));
+
+        return { longitude, latitude };
+    }
+</script>
+
+</body>
+</html>
