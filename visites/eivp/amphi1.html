@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visite Virtuelle - Aeroscopia</title>
+    <title>Visite Virtuelle - EIVP Amphithéâtre 1</title>
     <meta name="robots" content="noindex, nofollow">
     
     <link href="../../style/style.css" rel="stylesheet">
@@ -22,6 +22,27 @@
             <div class="loader"></div>
             <p>Chargement...</p>
         </div>
+
+        <div id="tooltip"></div>
+
+
+        <style>
+            #tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            white-space: nowrap;
+            pointer-events: none; /* Évite que la souris interagisse avec */
+            opacity: 0;
+            transform: translateY(5px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        </style>
+
+
 
 <div class="views-menu">
         <div class="side-menu ui-element">
@@ -772,14 +793,15 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
 
 
     const pointInteret = {
-        0:{ title: "Vidéoprojecteur", description:"Vidéoprojecteur"},
+        0:{ title: "Vidéoprojecteur", description:"Vidéoprojecteur, relié à l'ordinateur fixe (prise HDMI)"},
         1:{ title: "Matériel de visoconférence", description:"Matériel de capation vidéo et audio permettant la retransmission en direct."},
         2:{ title: "Ordinateur fixe", description:"Sonorisé (lecture de DVD possible)"},
         3:{ title: "Tableau amovible", description:"Tableau amovible"},
-        4:{ title: "Accessibilité", description:"Places accessibles aux PMR."},
+        4:{ title: "Accessibilité", description:"Places accessibles aux PMR. (6 places)"},
         5:{ title: "Matériel audio", description:"2 micros à main et 1 micro cravate."},
         6:{ title: "Système audio", description:"Système à boucles magnétiques"},
-        7:{ title: "Sortie de secours", description:"Sortie de secours"}
+        7:{ title: "Sortie de secours", description:"Sortie de secours"},
+        8:{ title: "Régie", description:"Régie de l'amphithéâtre"}
     };
 
     const pointsDeVue2 = {
@@ -791,15 +813,17 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
             { id: 2, lat: -9, lon: 35 },
             { id: 3, lat: -3, lon: -50 },
             { id: 4, lat: -26, lon: 81 },
-            { id: 5, lat: -9, lon: 45 },
             { id: 6, lat: 3, lon: 122 },
-            { id: 6, lat: 11, lon: 23 }
+            { id: 6, lat: 11, lon: 23 },
+            { id: 8, lat: -2, lon: 60 }
 
         ],
         ground: [
             { index:1, lat: -28, lon: -86  },
             { index:2, lat: -29, lon: 91  },
-            { index:3, lat: -23, lon: 3  }
+            { index:3, lat: -14, lon: 0, horizontal: true  },
+            { index:5, lat: 0, lon: 160, horizontal: true, pov: true },
+            { index:6, lat: -5, lon: 188, horizontal: true, pov: true }
         ]
         },
         1:{ img: 'https://gael-mgn.github.io/360/visites/eivp/amphi 1/2.webp', salle:0,
@@ -825,9 +849,11 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
             { id: 5, lat: -8, lon: 63 }
         ],
         ground: [
-            { index:0, lat: -21, lon: 182  },
+            { index:0, lat: -21, lon: 182, horizontal: true  },
             { index:1, lat: -16, lon: 220  },
-            { index:2, lat: -16, lon: -220  }
+            { index:2, lat: -16, lon: -220  },
+            { index:5, lat: 0, lon: 164, horizontal: true, pov: true },
+            { index:6, lat: -4, lon: 182, horizontal: true, pov: true }
         ]
         },
         5:{ img: 'https://gael-mgn.github.io/360/visites/eivp/amphi 1/6.webp', salle:0,
@@ -835,6 +861,19 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
             { id:7, lat: -5, lon: -19  }
         ],
         ground: [
+            { index:0, lat: -13, lon: -15, horizontal: true, pov: true },
+            { index:6, lat: -17, lon: -46, horizontal: true, pov: true }
+        ]
+        },
+        6:{ img: 'https://gael-mgn.github.io/360/visites/eivp/amphi 1/7.webp', salle:0,
+        interets: [
+            { id:7, lat: -4, lon: -4  },
+            { id:4, lat: -15, lon: 24  }
+        ],
+        ground: [
+            { index:0, lat: -18, lon: 8, horizontal: true, pov: true },
+            { index:3, lat: -8, lon: 8, horizontal: true, pov: true },
+            { index:5, lat: -2, lon: 142, horizontal: true, pov: true }
         ]
         }
     };
@@ -843,22 +882,18 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
         0:{ title: "Amphithéâtre 1", description: "Amphithéâtre 1", img: "amphi1.jpg", views: []}
     };
 
+const vuesss = [
+    { title: "Vue d'ensemble", id: 0, lon: 0, lat: 0, preview: "vue1.png" },
+    { title: "Vue depuis la rangée centrale", id: 6, lat: -2, lon: 8, preview: "vue4.png" },
+    { title: "Vue depuis l'estrade", id: 3, lat: 0, lon: 180, preview: "vue3.png" },
+    { title: "Fond (à droite)", id: 5, lat: -12, lon: -32, preview: "vue2.png" }
+];
 
-    vuesss = {
-        0:{
-            title:"Vue d'ensemble", id:0, lon:0, lat:0, preview:"vue1.png"
-        },
-        1:{
-            title:"Fond (à droite)", id:5, lat:-12, lon:-32, preview:"vue2.png"
-        },
-        2:{
-            title:"Vue depuis l'estrade", id:3, lat:0, lon:180, preview:"vue3.png"
-        }
-    };
 
     const viewsList = document.getElementById('all-views');
 
- Object.values(vuesss).forEach((element) => {
+
+    vuesss.forEach(element => {
 
 
           const listItem = document.createElement('div');
@@ -873,8 +908,7 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
                 </div>
             </div>`;
         listItem.addEventListener('click', () => {
-            loadScene(element.id);
-            animateCoordinates(element.lat, element.lon);
+            loadScene(element.id, element.lat, element.lon);
     });
         viewsList.appendChild(listItem);
 
@@ -1028,10 +1062,15 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
         }
 
         function loadScene(index, newLon= -1, newLat = -1) {
+
             if(newLon!=-1 && newLat !=-1){
-            lon = newLon;
-            lat = newLat;
-        }
+                animateCoordinates(newLon, newLat);
+            //lon = newLon;
+            //lat = newLat;
+
+            }
+
+
 
         console.log("Scene: " + index);
 
@@ -1051,9 +1090,9 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
 
 
             groundMarkers.forEach(marker => scene.remove(marker));
-            groundMarkers= [];
+            groundMarkers = [];
 
-            if (pointsDeVue2[currentTextureIndex].ground){
+            if (pointsDeVue2[currentTextureIndex].ground) {
                 pointsDeVue2[currentTextureIndex].ground.forEach(point => {
                     const marker = createGroundMarker(point);
                     scene.add(marker);
@@ -1064,21 +1103,7 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
 
 
             }
-            /*
-                    changeView2 = true;
-        closeInfoBox();
 
-        const point = pointsDeVue[index];
-        texture.dispose();
-        texture = new THREE.TextureLoader().load(point.img);
-        sphere.material.map = texture;
-        sphere.material.needsUpdate = true;
-
-        //lon = point.lon;
-        //lat = point.lat;
-
-        addPointsOfInterest(index); // Ajoute les points d'intérêt de la vue
-            */
         addPointsOfInterest(currentTextureIndex);
 
         }
@@ -1090,7 +1115,7 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
             const fadeSphere = new THREE.Mesh(sphere.geometry, newMaterial);
             scene.add(fadeSphere);
 
-            const fadeDuration = 800; // 500 ms
+            const fadeDuration = 800;
             const startTime = performance.now();
 
             function fadeIn() {
@@ -1150,6 +1175,7 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
     resizeRendererToDisplaySize(renderer);
     container.appendChild(renderer.domElement);
 
+    const tooltip = document.getElementById("tooltip");
 
 
 
@@ -1161,6 +1187,7 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
 
         if (pointsDeVue2[viewId].interets) {
             pointsDeVue2[viewId].interets.forEach(point => {
+                point.title = pointInteret[point.id].title;
                 const marker = createMarker(point);
                 scene.add(marker);
                 markers.push(marker);
@@ -1169,8 +1196,10 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
     }
 
     const markerTexture = new THREE.TextureLoader().load('https://gael-mgn.github.io/360/img/marker.png');
+    const povTexture = new THREE.TextureLoader().load('https://gael-mgn.github.io/360/img/pov.png');
     const hoverTexture = new THREE.TextureLoader().load("https://gael-mgn.github.io/360/img/marker_hover.png");
     let hoveredMarker = null; // Stocke le marqueur actuellement survolé, permet de changer l'icône au survol
+    let hoveredGroundMarker = null;
 
 
     function createMarker(point) {
@@ -1182,6 +1211,8 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
         const radius = 490; // Juste en dessous du fond pour être visible
         const phi = THREE.MathUtils.degToRad(90 - point.lat - 2);
         const theta = THREE.MathUtils.degToRad(point.lon);
+
+        marker.title = point.title;
 
         marker.position.set(
             radius * Math.sin(phi) * Math.cos(theta),
@@ -1244,6 +1275,37 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
 */
 
     function createGroundMarker(point) {
+        if (point.horizontal){
+                            /*const material = new THREE.SpriteMaterial({ map: povTexture });*/
+                            const material = new THREE.SpriteMaterial({
+            map: povTexture,
+            transparent: true,
+            depthTest: false,
+        });
+        const marker = new THREE.Sprite(material);
+
+        // Convertir longitude/latitude en coordonnées 3D sur la sphère
+        const radius = 490; // Juste en dessous du fond pour être visible
+        const phi = THREE.MathUtils.degToRad(90 - point.lat - 2);
+        const theta = THREE.MathUtils.degToRad(point.lon);
+
+        marker.position.set(
+            radius * Math.sin(phi) * Math.cos(theta),
+            radius * Math.cos(phi),
+            radius * Math.sin(phi) * Math.sin(theta)
+        );
+
+        marker.renderOrder = 1;
+
+        // Ajuster la taille du marqueur (valeur en fonction de la scène)
+        marker.scale.set(54, 54, 1);
+
+        // Ajouter les données utilisateur
+        marker.userData = point;
+
+        return marker;
+        }
+        else {
         // Création de la géométrie de la pastille (plane = plat)
         const geometry = new THREE.PlaneGeometry(200, 200);
         const material = new THREE.MeshBasicMaterial({
@@ -1273,7 +1335,11 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
         marker.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
         marker.userData = point;
-        return marker;
+        return marker;    
+        }
+        /*
+        */
+
     }
 
     let groundMarkers = [];
@@ -1292,7 +1358,6 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
     }, 150);
 
 
-    //init();
     preloadTextures();
 
 
@@ -1331,6 +1396,9 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
         lat = (event.clientY - onPointerDownMouseY) * 0.1 + onPointerDownLat;
     }
 
+    tooltip.style.left = event.pageX + 10 + "px"; // Décalage à droite
+    tooltip.style.top = event.pageY + 10 + "px"; // Décalage vers le bas
+
 
      // Normaliser les coordonnées de la souris (de -1 à 1 pour le Raycaster)
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -1348,24 +1416,70 @@ const distance = haversineDistance(startLat, startLon, endLat, endLon);
     }
 
 
-if (intersects.length > 0) {
+    if (intersects.length > 0) {
         const marker = intersects[0].object; // Premier objet touché
         if (hoveredMarker !== marker) {
             // Restaurer l'ancien marqueur survolé
             if (hoveredMarker) {
                 hoveredMarker.material.map = markerTexture;
+                tooltip.style.opacity = "0";
+                tooltip.style.transform = "translateY(5px)";
             }
+
             // Appliquer la texture de survol
             marker.material.map = hoverTexture;
             hoveredMarker = marker;
+            tooltip.textContent = marker.title;
+            tooltip.style.opacity = "1";
+            tooltip.style.transform = "translateY(0)";
+
+
+
         }
     } else {
         // Si aucun marqueur n'est survolé, restaurer l'ancien marqueur
         if (hoveredMarker) {
             hoveredMarker.material.map = markerTexture;
             hoveredMarker = null;
+
+            tooltip.style.opacity = "0";
+            tooltip.style.transform = "translateY(5px)";
         }
     }
+
+
+
+
+    if (intersects2.length > 0) {
+        const marker = intersects2[0].object; // Premier objet touché
+        const markerData = marker.userData;
+        if (hoveredGroundMarker !== marker) {
+            if (hoveredGroundMarker) {
+                //hoveredGroundMarker.material.map = markerTexture;
+                tooltip.style.opacity = "0";
+                tooltip.style.transform = "translateY(5px)";
+            }
+
+            // Appliquer la texture de survol
+            //marker.material.map = hoverTexture;
+            hoveredGroundMarker = marker;
+            console.log(markerData);
+            const vue = vuesss.find(vue => vue.id === markerData.index);
+            tooltip.textContent = vue.title;
+            tooltip.style.opacity = "1";
+            tooltip.style.transform = "translateY(0)";
+        }
+    } else {
+        // Si aucun marqueur n'est survolé, restaurer l'ancien marqueur
+        if (hoveredGroundMarker) {
+            //hoveredGroundMarker.material.map = markerTexture;
+            hoveredGroundMarker = null;
+            tooltip.style.opacity = "0";
+            tooltip.style.transform = "translateY(5px)";
+        }
+    }
+
+
 
 
     });
@@ -1389,7 +1503,14 @@ if (intersects.length > 0) {
         if (intersects2.length > 0) {
             const point = intersects2[0].object.userData;
             console.log(point);
-            loadScene(point.index);
+
+            if (point.pov){
+                const vue = vuesss.find(vue => vue.id === point.index);
+                loadScene(point.index, vue.lat, vue.lon);
+            }
+            else {
+                loadScene(point.index);
+            }
         }
         }
     });
