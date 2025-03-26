@@ -799,13 +799,14 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
         3:{ title: "Tableau amovible", description:"Tableau amovible"},
         4:{ title: "Accessibilité", description:"Places accessibles aux PMR. (6 places)"},
         5:{ title: "Matériel audio", description:"2 micros à main et 1 micro cravate."},
-        6:{ title: "Système audio", description:"Système à boucles magnétiques"},
+        6:{ title: "Système audio", description:"Système à boucles magnétiques", img:"boucle.png"},
         7:{ title: "Sortie de secours", description:"Sortie de secours"},
-        8:{ title: "Régie", description:"Régie de l'amphithéâtre"}
+        8:{ title: "Régie", description:"Régie de l'amphithéâtre"},
+        9:{ title: "Prises électriques", description:"1 prise électrique par personne (branchement sous la tablette)"}
     };
 
     const pointsDeVue2 = {
-        0:{ title:"vue 1", description:"Description", img: 'https://gael-mgn.github.io/360/visites/eivp/amphi 1/1.webp', salle:0,
+        6:{ title:"vue 1", description:"Description", img: 'https://gael-mgn.github.io/360/visites/eivp/amphi 1/1.webp', salle:0,
 
         interets: [
             { id: 0, lat: 3.2, lon: 0 },
@@ -823,7 +824,7 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
             { index:2, lat: -29, lon: 91  },
             { index:3, lat: -14, lon: 0, horizontal: true  },
             { index:5, lat: 0, lon: 160, horizontal: true, pov: true },
-            { index:6, lat: -5, lon: 188, horizontal: true, pov: true }
+            { index:0, lat: -5, lon: 188, horizontal: true, pov: true }
         ]
         },
         1:{ img: 'https://gael-mgn.github.io/360/visites/eivp/amphi 1/2.webp', salle:0,
@@ -831,7 +832,7 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
         interets: [
         ],
         ground: [
-            { index:0, lat: -26, lon: 90  },
+            { index:6, lat: -26, lon: 90  },
             { index:2, lat: -14, lon: 90  }
         ]
         },
@@ -839,21 +840,24 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
         interets: [
         ],
         ground: [
-            { index:0, lat: -27, lon: -88  },
+            { index:6, lat: -27, lon: -88  },
             { index:1, lat: -14, lon: -88  }
         ]
         },
         3:{ img: 'https://gael-mgn.github.io/360/visites/eivp/amphi 1/4.webp', salle:0,
         interets: [
             { id: 7, lat: -5, lon: -42 },
-            { id: 5, lat: -8, lon: 63 }
+            { id: 5, lat: -8, lon: 63 },
+            { id: 1, lat: -33, lon: 133 },
+            { id: 8, lat: -3, lon: 100 },
+            { id: 6, lat: 0, lon: 144 }
         ],
         ground: [
-            { index:0, lat: -21, lon: 182, horizontal: true  },
+            { index:6, lat: -21, lon: 182, horizontal: true  },
             { index:1, lat: -16, lon: 220  },
             { index:2, lat: -16, lon: -220  },
             { index:5, lat: 0, lon: 164, horizontal: true, pov: true },
-            { index:6, lat: -4, lon: 182, horizontal: true, pov: true }
+            { index:0, lat: -4, lon: 182, horizontal: true, pov: true }
         ]
         },
         5:{ img: 'https://gael-mgn.github.io/360/visites/eivp/amphi 1/6.webp', salle:0,
@@ -861,17 +865,22 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
             { id:7, lat: -5, lon: -19  }
         ],
         ground: [
-            { index:0, lat: -13, lon: -15, horizontal: true, pov: true },
-            { index:6, lat: -17, lon: -46, horizontal: true, pov: true }
+            { index:6, lat: -13, lon: -15, horizontal: true, pov: true },
+            { index:0, lat: -17, lon: -46, horizontal: true, pov: true }
         ]
         },
-        6:{ img: 'https://gael-mgn.github.io/360/visites/eivp/amphi 1/7.webp', salle:0,
+        0:{ img: 'https://gael-mgn.github.io/360/visites/eivp/amphi 1/7.webp', salle:0,
         interets: [
             { id:7, lat: -4, lon: -4  },
-            { id:4, lat: -15, lon: 24  }
+            { id:4, lat: -15, lon: 24  },
+            { id:0, lat: 9, lon: 5  },
+            { id:6, lat: -5, lon: 60  },
+            { id:5, lat: -8, lon: 25  },
+            { id:2, lat: -8, lon: 29  },
+            { id:9, lat: -21, lon: -23  }
         ],
         ground: [
-            { index:0, lat: -18, lon: 8, horizontal: true, pov: true },
+            { index:6, lat: -18, lon: 8, horizontal: true, pov: true },
             { index:3, lat: -8, lon: 8, horizontal: true, pov: true },
             { index:5, lat: -2, lon: 142, horizontal: true, pov: true }
         ]
@@ -883,8 +892,8 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
     };
 
 const vuesss = [
-    { title: "Vue d'ensemble", id: 0, lon: 0, lat: 0, preview: "vue1.png" },
-    { title: "Vue depuis la rangée centrale", id: 6, lat: -2, lon: 8, preview: "vue4.png" },
+    { title: "Vue depuis la rangée centrale", id: 0, lat: -2, lon: 8, preview: "vue4.png" },
+    { title: "Vue depuis la rangée frontale", id: 6, lon: 0, lat: 0, preview: "vue1.png" },
     { title: "Vue depuis l'estrade", id: 3, lat: 0, lon: 180, preview: "vue3.png" },
     { title: "Fond (à droite)", id: 5, lat: -12, lon: -32, preview: "vue2.png" }
 ];
