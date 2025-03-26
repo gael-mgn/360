@@ -115,7 +115,6 @@
         <h2>EIVP : visite virtuelle - Amphithéâtre 1</h2>
         <div class="popup-container">
             <img src="amphi1.jpg">
-            <h3>Caractéristiques</h3>
         <h3>Amphithéâtre 189 places avec régie</h3>
         <ul>
             <li>Capacité : 189 places assises + 6 places PMR.</li>
@@ -793,12 +792,12 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
 
 
     const pointInteret = {
-        0:{ title: "Vidéoprojecteur", description:"Vidéoprojecteur, relié à l'ordinateur fixe (prise HDMI)"},
-        1:{ title: "Matériel de visoconférence", description:"Matériel de capation vidéo et audio permettant la retransmission en direct."},
+        0:{ title: "Vidéoprojecteur", description:"Vidéoprojecteur, relié à l'ordinateur fixe (prise HDMI)", img:"hdmi.png"},
+        1:{ title: "Matériel de visoconférence", description:"Matériel de capation vidéo et audio permettant la retransmission en direct.", img:"visio.jpg"},
         2:{ title: "Ordinateur fixe", description:"Sonorisé (lecture de DVD possible)"},
         3:{ title: "Tableau amovible", description:"Tableau amovible"},
-        4:{ title: "Accessibilité", description:"Places accessibles aux PMR. (6 places)"},
-        5:{ title: "Matériel audio", description:"2 micros à main et 1 micro cravate."},
+        4:{ title: "Accessibilité", description:"6 Places accessibles aux PMR. (Amphithéâtre accessible depuis le RDC par un ascenseur)"},
+        5:{ title: "Matériel audio", description:"2 micros à main et 1 micro cravate.", img:"micro.jpg"},
         6:{ title: "Système audio", description:"Système à boucles magnétiques", img:"boucle.png"},
         7:{ title: "Sortie de secours", description:"Sortie de secours"},
         8:{ title: "Régie", description:"Régie de l'amphithéâtre"},
@@ -877,7 +876,8 @@ function showInfoBox(title, description, imageUrl = null, center = false, url= n
             { id:6, lat: -5, lon: 60  },
             { id:5, lat: -8, lon: 25  },
             { id:2, lat: -8, lon: 29  },
-            { id:9, lat: -21, lon: -23  }
+            { id:9, lat: -21, lon: -23  },
+            { id:1, lat: -10, lon: 15  }
         ],
         ground: [
             { index:6, lat: -18, lon: 8, horizontal: true, pov: true },
